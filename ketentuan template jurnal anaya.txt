@@ -1,0 +1,56 @@
+POJOK KIRI ATAS :
+logo 
+PT. ANAYA GLOBAL INDONESIA  
+Ruko Paramount 7 - CS - DF -2/18 RT 02 RW 02 Curug 
+Sangereng - Kelapa Dua Tangerang  
+02129324688  
+02129324689  
+accounting@anaya.co.id  
+www.anaya.co.id  
+3142998258451000  
+-----------------------------------------
+POJOK KANAN ATAS
+tanggal di ambil dari kolom "Tanggal" 
+faktur di ambil dari kolom "nomor transaksi"
+referensi pelanggan di ambil dari kolom "No Ref"
+--------------------------------------------------------
+PELANGGAN:
+ambil dari kolom "Nama Perusahaan"
+ambil dari kolom "Alamat Penagihan"
+ambil dari kolom "Alamat Pengiriman"
+-------------------------------------------------------
+isian tags di ambil dari kolom "Tag"
+isian metode pembayaran itu inputan 
+isian jatuh tempo ambil dari kolom "Tanggal Jatuh Tempo"
+isian tangggal pengiriman di ambil dari kolom "Tanggal"
+----------------------------------------------------------
+isian No tergantung terdapat ada berapa nomor transaksi yang di buat
+isian Qty di ambil dari kolom "Kuantitas"
+isian keterangan di ambil dari kolom"Deskripsi"
+isian HArgaSatuan(Rp.) di ambil dari kolom "Harga per Unit"
+isian Diskon di ambil dari kolom "Diskon Per Baris %"
+isian Pajak di ambil dari kolom "Tarif Pajak" tambahkan text "PPN" dan "%" di dalamnya, karna isi kolomnya hanya angka seperti"11.00"
+isian Jumlah (Rp.) di ambil dari kolom"Jumlah Kena Pajak per Baris"
+------------------------------------------------------------------------
+BAGIAN KIRI POJOK BAWAH:
+TERBILANG di ambil dari angka "Sisa Tagihan" dengan berbentuk text
+Detail Pembayaran:
+ Nama Bank : BCA
+ Cabang Bank : KCP MANDALA RAYA
+ Nomor Akun Bank : 3983101018
+ Atas Nama : PT ANAYA GLOBAL INDONESIA
+
+Catatan dan Instruksi Khusus
+------------------------------------------------------------------------
+BAGIAN KANAN POJOK BAWAH:
+Subtotal di ambil dari total Jumlah(Rp.) dan juga jika ada lebih dari 1 baris maka jumlah kan semuanya
+PPN11% 11.0% itu dari  itungan pajak
+Total dari Subtotal dan PPN11% di jumlahkan
+Sisa Tagihan dari Total
+
+
+
+Iswandi Simardjo 
+ 
+PT. Anaya Global Indonesia
+
