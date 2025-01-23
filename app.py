@@ -85,45 +85,49 @@ def generate_pdf(data, output_file):
     # Inisialisasi nomor urut
     no = 1
     for _, row in data['detail'].iterrows():
-        # Hitung tinggi baris maksimal
-        nama_barang_height = pdf.get_string_width(row['Nama Produk']) // 25 * 6 + 6
-        keterangan_height = pdf.get_string_width(row['Deskripsi']) // 25 * 6 + 6
+        # Hitung tinggi baris maksimal di semua kolom
+        nama_barang_height = ((pdf.get_string_width(row['Nama Produk']) // 25) + 1) * 6
+        keterangan_height = ((pdf.get_string_width(row['Deskripsi']) // 25) + 1) * 6
         row_height = max(nama_barang_height, keterangan_height, 6)
 
         # Kolom No.
         pdf.cell(15, row_height, str(no), 1, 0, 'C')
 
-        # Kolom Qty (format angka ribuan + satuan)
-        qty_with_unit = f"{int(row['Kuantitas']):,} {row['Satuan']}"  # Format ribuan dan gabungkan dengan satuan
+        # Kolom Qty
+        qty_with_unit = f"{int(row['Kuantitas']):,} {row['Satuan']}"  # Format ribuan + satuan
         pdf.cell(22, row_height, qty_with_unit, 1, 0, 'C')
 
-        # Nama Barang
+        # Kolom Nama Barang (Manual Boundary)
+        x_pos = pdf.get_x()  # Simpan posisi x
+        y_pos = pdf.get_y()  # Simpan posisi y
+        pdf.multi_cell(25, 6, row['Nama Produk'], 0, 'L')  # Multi-cell untuk teks panjang
+        pdf.rect(x_pos, y_pos, 25, row_height)  # Buat kotak manual
+        pdf.set_xy(x_pos + 25, y_pos)  # Pindahkan kursor ke kolom berikutnya
+
+        # Kolom Keterangan (Manual Boundary)
         x_pos = pdf.get_x()
         y_pos = pdf.get_y()
-        pdf.multi_cell(25, 6, row['Nama Produk'], 1, 'L')
-        pdf.set_xy(x_pos + 25, y_pos)  # Pindah ke posisi kolom berikutnya
+        pdf.multi_cell(25, 6, row['Deskripsi'], 0, 'L')
+        pdf.rect(x_pos, y_pos, 25, row_height)  # Buat kotak manual
+        pdf.set_xy(x_pos + 25, y_pos)  # Pindahkan kursor ke kolom berikutnya
 
-        # Keterangan Barang
-        x_pos = pdf.get_x()
-        y_pos = pdf.get_y()
-        pdf.multi_cell(25, 6, row['Deskripsi'], 1, 'L')
-        pdf.set_xy(x_pos + 25, y_pos)  # Pindah ke posisi kolom berikutnya
-
-        # Harga Satuan (format uang dengan desimal)
+        # Kolom Harga Satuan
         harga_satuan = f"{float(row['Harga per Unit']):,.2f}"
         pdf.cell(23, row_height, harga_satuan, 1, 0, 'R')
 
-        # Diskon
+        # Kolom Diskon
         pdf.cell(20, row_height, f"{row['Diskon Per Baris %']}", 1, 0, 'R')
 
-        # Pajak
+        # Kolom Pajak
         pdf.cell(20, row_height, f"PPN{row['Tarif Pajak']}%", 1, 0, 'R')
 
-        # Jumlah (format uang dengan desimal)
+        # Kolom Jumlah
         jumlah = f"{float(row['Jumlah Kena Pajak per Baris']):,.2f}"
         pdf.cell(30, row_height, jumlah, 1, 1, 'R')
 
-        no += 1  # Tambahkan nomor urut
+        # Increment nomor
+        no += 1
+
 
     pdf.ln(5)
 
@@ -172,7 +176,7 @@ def generate_pdf(data, output_file):
     # TERBILANG dan Detail Pembayaran
     terbilang_text = f"TERBILANG: {data['terbilang']}"
     # Posisi "TERBILANG" ke kiri, sejajar dengan Subtotal
-    pdf.set_xy(10, pdf.get_y() + 5)  # Posisikan sedikit di bawah subtotal
+    pdf.set_xy(10, pdf.get_y() - 25)  # Posisikan sedikit di bawah subtotal
     pdf.set_font('Arial', 'B', 9)  # Font Bold untuk TERBILANG
     pdf.multi_cell(100, 6, terbilang_text, 0, 'L')  # MultiCell untuk teks panjang
     pdf.ln(2)  # Tambahkan jarak vertikal
