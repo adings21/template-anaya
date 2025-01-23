@@ -69,10 +69,10 @@ def generate_pdf(data, output_file):
     # Detail Tabel
     pdf.set_fill_color(200, 200, 200)
     pdf.set_font('Arial', 'B', 8)
-    pdf.cell(15, 6, 'No.', 1, 0, 'C', True)
+    pdf.cell(10, 6, 'No.', 1, 0, 'C', True)
     pdf.cell(22, 6, 'Qty', 1, 0, 'C', True)  # Perlebar kolom Qty
-    pdf.cell(25, 6, 'Nama Barang', 1, 0, 'C', True)
-    pdf.cell(25, 6, 'Keterangan', 1, 0, 'C', True)
+    pdf.cell(40, 6, 'Nama Barang', 1, 0, 'C', True)
+    pdf.cell(30, 6, 'Keterangan', 1, 0, 'C', True)
     pdf.cell(23, 6, 'Harga Satuan', 1, 0, 'C', True)
     pdf.cell(20, 6, 'Diskon', 1, 0, 'C', True)
     pdf.cell(20, 6, 'Pajak', 1, 0, 'C', True)
@@ -86,12 +86,12 @@ def generate_pdf(data, output_file):
     no = 1
     for _, row in data['detail'].iterrows():
         # Hitung tinggi baris maksimal di semua kolom
-        nama_barang_height = ((pdf.get_string_width(row['Nama Produk']) // 25) + 1) * 6
-        keterangan_height = ((pdf.get_string_width(row['Deskripsi']) // 25) + 1) * 6
+        nama_barang_height = ((pdf.get_string_width(row['Nama Produk']) // 40) + 1) * 6
+        keterangan_height = ((pdf.get_string_width(row['Deskripsi']) // 30) + 1) * 6
         row_height = max(nama_barang_height, keterangan_height, 6)
 
         # Kolom No.
-        pdf.cell(15, row_height, str(no), 1, 0, 'C')
+        pdf.cell(10, row_height, str(no), 1, 0, 'C')
 
         # Kolom Qty
         qty_with_unit = f"{int(row['Kuantitas']):,} {row['Satuan']}"  # Format ribuan + satuan
@@ -100,16 +100,16 @@ def generate_pdf(data, output_file):
         # Kolom Nama Barang (Manual Boundary)
         x_pos = pdf.get_x()  # Simpan posisi x
         y_pos = pdf.get_y()  # Simpan posisi y
-        pdf.multi_cell(25, 6, row['Nama Produk'], 0, 'L')  # Multi-cell untuk teks panjang
-        pdf.rect(x_pos, y_pos, 25, row_height)  # Buat kotak manual
-        pdf.set_xy(x_pos + 25, y_pos)  # Pindahkan kursor ke kolom berikutnya
+        pdf.multi_cell(40, 6, row['Nama Produk'], 0, 'L')  # Multi-cell untuk teks panjang
+        pdf.rect(x_pos, y_pos, 40, row_height)  # Buat kotak manual
+        pdf.set_xy(x_pos + 40, y_pos)  # Pindahkan kursor ke kolom berikutnya
 
         # Kolom Keterangan (Manual Boundary)
         x_pos = pdf.get_x()
         y_pos = pdf.get_y()
-        pdf.multi_cell(25, 6, row['Deskripsi'], 0, 'L')
-        pdf.rect(x_pos, y_pos, 25, row_height)  # Buat kotak manual
-        pdf.set_xy(x_pos + 25, y_pos)  # Pindahkan kursor ke kolom berikutnya
+        pdf.multi_cell(30, 6, row['Deskripsi'], 0, 'L')
+        pdf.rect(x_pos, y_pos, 30, row_height)  # Buat kotak manual
+        pdf.set_xy(x_pos + 30, y_pos)  # Pindahkan kursor ke kolom berikutnya
 
         # Kolom Harga Satuan
         harga_satuan = f"{float(row['Harga per Unit']):,.2f}"
