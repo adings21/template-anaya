@@ -19,7 +19,7 @@ class PDF(FPDF):
         self.ln(10)
 
     def footer(self):
-        self.set_y(-30)
+        self.set_y(-40)
         self.set_font('Arial', '', 10)
         self.cell(0, 6, "Iswandi Simardjo", 0, 1, 'R')
         self.cell(0, 6, "PT. Anaya Global Indonesia", 0, 1, 'R')
@@ -65,15 +65,17 @@ def generate_pdf(data, output_file):
     pdf.cell(40, 6, data["Tanggal"], 1, 1, 'C')
     pdf.ln(5)
 
-        # Detail Tabel
+   # Detail Tabel
+    # Detail Tabel
     pdf.set_fill_color(200, 200, 200)
     pdf.set_font('Arial', 'B', 8)
     pdf.cell(15, 6, 'No.', 1, 0, 'C', True)
-    pdf.cell(20, 6, 'Qty', 1, 0, 'C', True)
-    pdf.cell(50, 6, 'Nama Barang', 1, 0, 'C', True)
-    pdf.cell(30, 6, 'Harga Satuan', 1, 0, 'C', True)
-    pdf.cell(25, 6, 'Diskon', 1, 0, 'C', True)
-    pdf.cell(25, 6, 'Pajak', 1, 0, 'C', True)
+    pdf.cell(22, 6, 'Qty', 1, 0, 'C', True)  # Perlebar kolom Qty
+    pdf.cell(25, 6, 'Nama Barang', 1, 0, 'C', True)
+    pdf.cell(25, 6, 'Keterangan', 1, 0, 'C', True)
+    pdf.cell(23, 6, 'Harga Satuan', 1, 0, 'C', True)
+    pdf.cell(20, 6, 'Diskon', 1, 0, 'C', True)
+    pdf.cell(20, 6, 'Pajak', 1, 0, 'C', True)
     pdf.cell(30, 6, 'Jumlah', 1, 1, 'C', True)
 
     # Isi Tabel
@@ -81,37 +83,77 @@ def generate_pdf(data, output_file):
     pdf.set_fill_color(255, 255, 255)
 
     # Inisialisasi nomor urut
-    no = 1  
+    no = 1
     for _, row in data['detail'].iterrows():
-        pdf.cell(15, 6, str(no), 1)  # Kolom No.
-        pdf.cell(20, 6, str(row['Kuantitas']), 1)  # Kolom Qty
-        pdf.cell(50, 6, row['Deskripsi'][:30], 1)  # Nama Barang (max 30 karakter)
-        pdf.cell(30, 6, f"{row['Harga per Unit']:,}", 1)  # Harga Satuan
-        pdf.cell(25, 6, f"{row['Diskon Per Baris %']}", 1)  # Diskon
-        pdf.cell(25, 6, f"PPN{row['Tarif Pajak']}%", 1)  # Pajak
-        pdf.cell(30, 6, f"{row['Jumlah Kena Pajak per Baris']:,}", 1, 1)  # Jumlah
+        # Hitung tinggi baris maksimal
+        nama_barang_height = pdf.get_string_width(row['Nama Produk']) // 25 * 6 + 6
+        keterangan_height = pdf.get_string_width(row['Deskripsi']) // 25 * 6 + 6
+        row_height = max(nama_barang_height, keterangan_height, 6)
+
+        # Kolom No.
+        pdf.cell(15, row_height, str(no), 1, 0, 'C')
+
+        # Kolom Qty (format angka ribuan + satuan)
+        qty_with_unit = f"{int(row['Kuantitas']):,} {row['Satuan']}"  # Format ribuan dan gabungkan dengan satuan
+        pdf.cell(22, row_height, qty_with_unit, 1, 0, 'C')
+
+        # Nama Barang
+        x_pos = pdf.get_x()
+        y_pos = pdf.get_y()
+        pdf.multi_cell(25, 6, row['Nama Produk'], 1, 'L')
+        pdf.set_xy(x_pos + 25, y_pos)  # Pindah ke posisi kolom berikutnya
+
+        # Keterangan Barang
+        x_pos = pdf.get_x()
+        y_pos = pdf.get_y()
+        pdf.multi_cell(25, 6, row['Deskripsi'], 1, 'L')
+        pdf.set_xy(x_pos + 25, y_pos)  # Pindah ke posisi kolom berikutnya
+
+        # Harga Satuan (format uang dengan desimal)
+        harga_satuan = f"{float(row['Harga per Unit']):,.2f}"
+        pdf.cell(23, row_height, harga_satuan, 1, 0, 'R')
+
+        # Diskon
+        pdf.cell(20, row_height, f"{row['Diskon Per Baris %']}", 1, 0, 'R')
+
+        # Pajak
+        pdf.cell(20, row_height, f"PPN{row['Tarif Pajak']}%", 1, 0, 'R')
+
+        # Jumlah (format uang dengan desimal)
+        jumlah = f"{float(row['Jumlah Kena Pajak per Baris']):,.2f}"
+        pdf.cell(30, row_height, jumlah, 1, 1, 'R')
+
         no += 1  # Tambahkan nomor urut
+
     pdf.ln(5)
+
+
+
+
+
+
 
 
    # Subtotal dan lainnya
     pdf.set_font('Arial', 'B', 9)
     pdf.set_fill_color(240, 240, 240)  # Warna abu terang
-    # Subtotal
+   # Subtotal
     pdf.cell(120)  # Geser ke kanan
     pdf.cell(30, 10, 'Subtotal:', 0, 0, 'L', True)  # Warna dengan fill
-    pdf.cell(40, 10, f"{data['subtotal']:,}", 0, 1, 'R', True)
+    # Format subtotal dengan dua desimal
+    subtotal = f"{float(data['subtotal']):,.2f}"
+    pdf.cell(40, 10, subtotal, 0, 1, 'R', True)
     # DPP (11/12)
     dpp = data['subtotal'] * 11 / 12  # Perhitungan DPP
     pdf.set_fill_color(255, 255, 255)  # Warna putih (tidak ada fill)
     pdf.cell(120)
-    pdf.cell(30, 10, 'DPP (11/12):', 0, 0, 'L', True)
+    pdf.cell(30, 10, 'DPP:', 0, 0, 'L', True)
     pdf.cell(40, 10, f"{dpp:,.2f}", 0, 1, 'R', True)
     # PPN 12%
     ppn_12 = dpp * 0.12  # Perhitungan PPN 12%
     pdf.set_fill_color(240, 240, 240)  # Warna abu terang
     pdf.cell(120)
-    pdf.cell(30, 10, 'PPN 12%:', 0, 0, 'L', True)
+    pdf.cell(30, 10, 'PPN:', 0, 0, 'L', True)
     pdf.cell(40, 10, f"{ppn_12:,.2f}", 0, 1, 'R', True)
     # Total
     total = data['subtotal'] + ppn_12
@@ -119,11 +161,12 @@ def generate_pdf(data, output_file):
     pdf.cell(120)
     pdf.cell(30, 10, 'Total:', 0, 0, 'L', True)  # Warna dengan fill
     pdf.cell(40, 10, f"{total:,.2f}", 0, 1, 'R', True)
+
     # Sisa Tagihan
     pdf.set_fill_color(240, 240, 240)  # Warna abu terang
     pdf.cell(120)
     pdf.cell(30, 10, 'Sisa Tagihan:', 0, 0, 'L', True)  # Warna tanpa fill
-    pdf.cell(40, 10, f"{data['Sisa Tagihan']:,}", 0, 1, 'R', True)
+    pdf.cell(40, 10, f"{data['Sisa Tagihan']:,.2f}", 0, 1, 'R', True)
 
 
     # TERBILANG dan Detail Pembayaran
